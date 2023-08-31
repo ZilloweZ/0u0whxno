@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  #captcha {
+    font-size: 20px;
+    font-family: Arial, sans-serif;
+  }
+  .input-container {
+    display: inline-block;
+    margin-right: 10px;
+    text-align: center;
+  }
+  .letter {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
+  }
+  .captcha-input {
+    font-size: 16px;
+    width: 30px;
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 5px;
+  }
+  #timer {
+    font-size: 16px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div id="captcha">Please complete the CAPTCHA:</div>
+<div id="captchaWord">
+  <div class="input-container">
+    <div class="letter"></div>
+    <input class="captcha-input" type="text" maxlength="1" autocomplete="off">
+  </div>
+  <div class="input-container">
+    <div class="letter"></div>
+    <input class="captcha-input" type="text" maxlength="1" autocomplete="off">
+  </div>
+  <div class="input-container">
+    <div class="letter"></div>
+    <input class="captcha-input" type="text" maxlength="1" autocomplete="off">
+  </div>
+  <div class="input-container">
+    <div class="letter"></div>
+    <input class="captcha-input" type="text" maxlength="1" autocomplete="off">
+  </div>
+  <div class="input-container">
+    <div class="letter"></div>
+    <input class="captcha-input" type="text" maxlength="1" autocomplete="off">
+  </div>
+</div>
+<button id="verifyButton">Verify</button>
+<div id="timer">Time left: <span id="timeLeft">10</span> seconds</div>
+
+<script>
+  let timer = 10;
+  let interval;
+
+  const letters = document.querySelectorAll('.letter');
+  const inputs = document.querySelectorAll('.captcha-input');
+  let captchaWord = generateRandomWord();
+
+  // Display random word above input fields
+  letters.forEach((letter, index) => {
+    letter.textContent = captchaWord[index];
+  });
+
+  // Reveal letter when input is clicked
+  // inputs.forEach((input, index) => {
+    // input.addEventListener('click', () => {
+     // input.value = captchaWord[index];
+   // });
+  // });
+
+  function generateRandomWord() {
+    const randomWord = [];
+    for (let i = 0; i < 5; i++) {
+      randomWord.push(String.fromCharCode(65 + Math.floor(Math.random() * 26))); // Generates random uppercase letter
+    }
+    return randomWord;
+  }
+
+  function updateTimer() {
+    timer--;
+    document.getElementById('timeLeft').textContent = timer;
+    if (timer === 0) {
+      clearInterval(interval);
+      timer = 10;
+      captchaWord = generateRandomWord();
+      letters.forEach((letter, index) => {
+        letter.textContent = captchaWord[index];
+      });
+      document.getElementById('timeLeft').textContent = timer;
+      interval = setInterval(updateTimer, 1000);
+    }
+  }
+
+  interval = setInterval(updateTimer, 1000);
+
+  const verifyButton = document.getElementById('verifyButton');
+  verifyButton.addEventListener('click', () => {
+    clearInterval(interval);
+    const userWord = Array.from(inputs).map(input => input.value).join('');
+    if (userWord === captchaWord.join('')) {
+      alert('Captcha verification successful! Redirecting...');
+      // Redirect to another site after successful verification
+      window.location.href = 'https://www.example.com'; // Replace with your desired URL
+    } else {
+      alert('Captcha verification failed. Please try again.');
+      captchaWord = generateRandomWord();
+      letters.forEach((letter, index) => {
+        letter.textContent = captchaWord[index];
+      });
+      timer = 10;
+      interval = setInterval(updateTimer, 1000);
+      inputs.forEach(input => {
+        input.value = '';
+      });
+    }
+  });
+</script>
+</body>
+</html>
